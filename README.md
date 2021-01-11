@@ -11,3 +11,4 @@ If using the Teensy Triple CAN breakout board, it can be powered by 12V on the C
 
 The ability of this old receiver to even get WAAS will end sometime between 2024 and 2026, depending on when the new GPS rollout is complete.
 
+IMPORTANT: on Teensy you need the latest git version of FlexCAN_T4 from https://github.com/tonton81/FlexCAN_T4.  The version included in the TeensyDuino addon for Arduino IDE is too old.
