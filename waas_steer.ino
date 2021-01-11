@@ -4,18 +4,27 @@
 	be done, albeit at much lower accuracy.  
 	
 	This version is for the Arduino Due or Teensy 4.0 only, with CAN
-	transceivers attached.
+	transceivers attached.  For Teensy I recommend the nice SKPang
+	Teensy 4.0 Triple CAN breakout board:
+	http://skpang.co.uk/catalog/teensy-40-triple-can-board-include-teensy-40-p-1575.html
+	https://copperhilltech.com/teensy-4-0-triple-can-bus-board-with-two-can-2-0b-and-one-can-fd-port/
+
+	For Due boards:
+	https://copperhilltech.com/dual-can-bus-interface-for-arduino-due/
+
+	The Teensy breakout board can be powered by 12V on the CAN3 port.
 	
-	Should be installed between the receiver and the tractor on the CAN
-	lines.  Break the CAN wires and have the receiver CAN wires plug into a
-	transceiver attached to one of the Due's CAN ports, and the tractor
-	CAN wires in the other port. Doesn't matter which.  Should work 
-	with older receivers such as the iTC.
+	Should be installed between the tractor and the brown box monitor.
+	The Implement CAN bus wires can be cut into two pairs. The pair 
+	going to the monitor goes in one CAN, the pair going to the tractor 
+	in the other CAN port. On Teensy use CAN1 and CAN2 only, but power
+	can go to CAN3.
 
-	Also works by inserting between the post and where the implement
-	bus plugs into the brown box monitor.
+	This sketch is designed to work only with the Brown Box monitor and
+	iTC receivers.
 
-	Note that WAAS support for this old receiver will not work after 2024.
+	Note that WAAS support for ITC receivers will not work after 2024 or
+	2026, depending on when the US gov't finishes the new GPS rollout.
 
 	This file is released under the GPL v3 or greater.
 
@@ -72,8 +81,8 @@ typedef union {
     uint8_t byte[8]; //alternate name so you can omit the s if you feel it makes more sense
 } BytesUnion;
 
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can1;
+FlexCAN_T4<CAN1, RX_SIZE_1024, TX_SIZE_1024> Can0;
+FlexCAN_T4<CAN2, RX_SIZE_1024, TX_SIZE_1024> Can1;
 #endif
 
 static inline void print_hex(uint8_t *data, int len) {
@@ -139,6 +148,7 @@ void can0_got_frame(const CAN_message_t &orig_frame) {
 	CAN_message_t frame = orig_frame;
 	got_frame(frame.id, frame.flags.extended, frame.len,
 	          (BytesUnion *)frame.buf);
+	frame.seq = 1;
 	Can1.write(frame);
 }
 
@@ -147,6 +157,7 @@ void can1_got_frame(const CAN_message_t &orig_frame) {
 	CAN_message_t frame = orig_frame;
 	got_frame(frame.id, frame.flags.extended, frame.len,
 	          (BytesUnion *)frame.buf);
+	frame.seq = 1;
 	Can0.write(frame);
 }
 
@@ -169,19 +180,18 @@ void setup()
 	//Teensy FlexCAN_T4 setup
 	Can0.begin();
 	Can0.setBaudRate(250000);
+	Can0.setMaxMB(32);
 	Can0.enableFIFO();
-	Can0.enableFIFOInterrupt();
 	Can0.onReceive(can0_got_frame);
-	Can0.enableMBInterrupts(FIFO);
-	Can0.enableMBInterrupts();
 
 	Can1.begin();
 	Can1.setBaudRate(250000);
+	Can1.setMaxMB(32);
 	Can1.enableFIFO();
-	Can1.enableFIFOInterrupt();
 	Can1.onReceive(can1_got_frame);
-	Can1.enableMBInterrupts(FIFO);
-	Can1.enableMBInterrupts();
+
+	Can0.enableFIFOInterrupt();
+	Can1.enableFIFOInterrupt();
 #else
 	Can0.begin(CAN_BPS_250K);
 	Can1.begin(CAN_BPS_250K);
@@ -198,9 +208,5 @@ void setup()
 
 void loop()
 {
-#ifdef TEENSY
-	//process collected frames
-	Can0.events();
-#endif
 }
 

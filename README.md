@@ -7,5 +7,7 @@ Two can transceivers are required to interface the Due or Teensy 4.0 with the CA
 
 It's also possible to place the filter between the implement bus and the back of the brown box monitor.
 
-The ability of this old receiver to even get WAAS will end around 2024.
+If using the Teensy Triple CAN breakout board, it can be powered by 12V on the CAN3 connector.
+
+The ability of this old receiver to even get WAAS will end sometime between 2024 and 2026, depending on when the new GPS rollout is complete.
 
