@@ -20,6 +20,9 @@
 	in the other CAN port. On Teensy use CAN1 and CAN2 only, but power
 	can go to CAN3.
 
+	Both CAN ports used should have terminator jumpers installed into
+	the breakout board.
+
 	This sketch is designed to work only with the Brown Box monitor and
 	iTC receivers.
 
