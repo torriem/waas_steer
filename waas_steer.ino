@@ -40,6 +40,12 @@
 
 	https://github.com/tonton81/FlexCAN_T4
 
+	IMPORTANT: on Teensy you need the latest git version of FlexCAN_T4
+	from https://github.com/tonton81/FlexCAN_T4.  The version included
+	in the TeensyDuino addon for Arduino IDE is too old. Overwrite the
+	version that is in the hardware/teensy/avr/libraries folder inside
+	the Arduino install folder.  If you don't do this this sketch will
+	not function.
  */
 
 #ifdef ARDUINO_TEENSY40
@@ -47,7 +53,7 @@
 #endif
 
 #ifdef TEENSY
-#  include <FlexCAN_T4.h>
+#  include <FlexCAN_T4.h> //Be sure to grab the latest from github
 #else //Due
 #  include <due_can.h>
 #endif 
