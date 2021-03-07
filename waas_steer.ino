@@ -141,9 +141,10 @@ void got_frame(uint32_t id, uint8_t extended, uint8_t length, BytesUnion *data) 
 	if (srcaddr == 28 && PGN == 65535 && data->bytes[0] == 0x53) {
 
 		//Allow WAAS to steer
-		data->bytes[4] = 0x40;
 		signal_type = data->bytes[3] >> 4;
 		if (signal_type > 0 and signal_type < 4) {
+			data->bytes[4] = 0x40; //indicate that the receiver is set to SF
+
 			//Serial.println("Steer with low-quality differential signal.");
 			data->bytes[3] = 0x43; //SF1, low accuracy
 		}
