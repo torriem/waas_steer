@@ -48,7 +48,11 @@
 	not function.
  */
 
+//Detect if we're compiling for Teensy 4 or 4.1
 #ifdef ARDUINO_TEENSY40
+#define TEENSY 1
+#endif
+#ifdef ARDUINO_TEENSY41
 #define TEENSY 1
 #endif
 
@@ -143,7 +147,7 @@ void got_frame(uint32_t id, uint8_t extended, uint8_t length, BytesUnion *data) 
 		//Allow WAAS to steer
 		signal_type = data->bytes[3] >> 4;
 		if (signal_type > 0 and signal_type < 4) {
-			data->bytes[4] = 0x40; //indicate that the receiver is set to SF
+			data->bytes[4] = 0x40; //indicate that the receiver is set to SF1
 
 			//Serial.println("Steer with low-quality differential signal.");
 			data->bytes[3] = 0x43; //SF1, low accuracy
