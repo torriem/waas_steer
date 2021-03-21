@@ -190,6 +190,9 @@ void can1_got_frame(CAN_FRAME *frame) {
 void setup()
 {
 	//Serial.begin(115200);
+
+	pinMode(13, OUTPUT);
+	digitalWrite(13, HIGH);
 #ifdef TEENSY
 	//Teensy FlexCAN_T4 setup
 	Can0.begin();
