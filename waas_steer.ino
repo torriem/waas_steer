@@ -3,21 +3,25 @@
 	always shows up as SF1, even if it's in WAAS mode, so steering can
 	be done, albeit at much lower accuracy.  
 	
-	This version is for the Arduino Due or Teensy 4.0 only, with CAN
-	transceivers attached.  For Teensy I recommend the nice SKPang
+	This version is for the Arduino Due, Teensy 4.x, or Teensy 3.6
+	with built-in CAN support.  For Teensy I recommend the nice SKPang
 	Teensy 4.0 Triple CAN breakout board:
 	http://skpang.co.uk/catalog/teensy-40-triple-can-board-include-teensy-40-p-1575.html
 	https://copperhilltech.com/teensy-4-0-triple-can-bus-board-with-two-can-2-0b-and-one-can-fd-port/
 
+	If the Teensy 3.6 works out, I recommend:
+	https://copperhilltech.com/teensy-3-6-dual-can-bus-breakout-board/
+
 	For Due boards:
 	https://copperhilltech.com/dual-can-bus-interface-for-arduino-due/
 
-	The Teensy breakout board can be powered by 12V on the CAN3 port.
+	The Teensy 4 breakout board can be powered by 12V on the CAN3 port.
+	Teensy 3.6 can be powered by 12V on the CAN0 port.
 	
 	Should be installed between the tractor and the brown box monitor.
 	The Implement CAN bus wires can be cut into two pairs. The pair 
 	going to the monitor goes in one CAN, the pair going to the tractor 
-	in the other CAN port. On Teensy use CAN1 and CAN2 only, but power
+	in the other CAN port. On Teensy 4 use CAN1 and CAN2 only, but power
 	can go to CAN3.
 
 	Both CAN ports used should have terminator jumpers installed into
@@ -53,6 +57,9 @@
 #define TEENSY 1
 #endif
 #ifdef ARDUINO_TEENSY41
+#define TEENSY 1
+#endif
+#ifdef ARDUINO_TEENSY36
 #define TEENSY 1
 #endif
 
@@ -94,8 +101,15 @@ typedef union {
     uint8_t byte[8]; //alternate name so you can omit the s if you feel it makes more sense
 } BytesUnion;
 
+#ifdef ARDUINO_TEENSY36
+FlexCAN_T4<CAN0, RX_SIZE_1024, TX_SIZE_1024> Can0;
+FlexCAN_T4<CAN1, RX_SIZE_1024, TX_SIZE_1024> Can1;
+#else
 FlexCAN_T4<CAN1, RX_SIZE_1024, TX_SIZE_1024> Can0;
 FlexCAN_T4<CAN2, RX_SIZE_1024, TX_SIZE_1024> Can1;
+#endif
+
+
 #endif
 
 static inline void print_hex(uint8_t *data, int len) {
