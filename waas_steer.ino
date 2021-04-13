@@ -158,13 +158,19 @@ void got_frame(uint32_t id, uint8_t extended, uint8_t length, BytesUnion *data) 
 
 	if (srcaddr == 28 && PGN == 65535 && data->bytes[0] == 0x53) {
 
-		//Allow WAAS to steer
+		//most significant byte indicates the signal type the GPS has
 		signal_type = data->bytes[3] >> 4;
-		if (signal_type > 0 and signal_type < 4) {
+
+		if (signal_type < 4) { //if we don't have SF1, pretend we do
 			data->bytes[4] = 0x40; //indicate that the receiver is set to SF1
 
-			//Serial.println("Steer with low-quality differential signal.");
-			data->bytes[3] = 0x43; //SF1, low accuracy
+			//Serial.println("DEBUG: Steer with low-quality signal.");
+
+			//the second byte is the signal strength bar graph indicator
+			if (signal_type > 1)
+				data->bytes[3] = 0x46; //WAAS, so pretend SF1, medium accuracy
+			else
+				data->bytes[3] = 0x43; //3D+ so pretend SF1, low accuracy
 		}
 		//otherwise we'll let it through as is
 	}
@@ -205,6 +211,7 @@ void setup()
 {
 	//Serial.begin(115200);
 
+	//Turn on the built-in LED as a power indicator
 	pinMode(13, OUTPUT);
 	digitalWrite(13, HIGH);
 #ifdef TEENSY
