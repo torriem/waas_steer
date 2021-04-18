@@ -158,7 +158,8 @@ void got_frame(uint32_t id, uint8_t extended, uint8_t length, BytesUnion *data) 
 
 	if (srcaddr == 28 && PGN == 65535 && data->bytes[0] == 0x53) {
 
-		//most significant byte indicates the signal type the GPS has
+		//most significant nibble (4 bits) indicates the signal
+		//type the GPS has
 		signal_type = data->bytes[3] >> 4;
 
 		if (signal_type < 4) { //if we don't have SF1, pretend we do
@@ -166,11 +167,14 @@ void got_frame(uint32_t id, uint8_t extended, uint8_t length, BytesUnion *data) 
 
 			//Serial.println("DEBUG: Steer with low-quality signal.");
 
-			//the second byte is the signal strength bar graph indicator
+			//the least significant nibble is the signal strength
+			//bar graph indicator
 			if (signal_type > 1)
-				data->bytes[3] = 0x46; //WAAS, so pretend SF1, medium accuracy
+				//WAAS, so pretend SF1, medium accuracy
+				data->bytes[3] = 0x46; 
 			else
-				data->bytes[3] = 0x43; //3D+ so pretend SF1, low accuracy
+				//3D+ so pretend SF1, low accuracy
+				data->bytes[3] = 0x43; 
 		}
 		//otherwise we'll let it through as is
 	}
