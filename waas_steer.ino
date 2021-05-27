@@ -222,13 +222,21 @@ void setup()
 	//Teensy FlexCAN_T4 setup
 	Can0.begin();
 	Can0.setBaudRate(250000);
+#ifdef ARDUINO_TEENSY36
+	Can0.setMaxMB(16);
+#else
 	Can0.setMaxMB(32);
+#endif
 	Can0.enableFIFO();
 	Can0.onReceive(can0_got_frame);
 
 	Can1.begin();
 	Can1.setBaudRate(250000);
+#ifdef ARDUINO_TEENSY36
+	Can1.setMaxMB(16);
+#else
 	Can1.setMaxMB(32);
+#endif
 	Can1.enableFIFO();
 	Can1.onReceive(can1_got_frame);
 
